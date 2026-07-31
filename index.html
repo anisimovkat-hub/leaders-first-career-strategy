@@ -184,9 +184,12 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   var legacyNameInput = form.querySelector('[name="name"]');
   if (legacyNameInput) {
     var legacyNameLabel = legacyNameInput.closest('label');
-    legacyNameLabel.insertAdjacentHTML('beforebegin', '<label><span>First name</span><input autocomplete="given-name" required placeholder="Your first name" name="firstname"></label><label><span>Last name</span><input autocomplete="family-name" required placeholder="Your last name" name="lastname"></label>');
+    legacyNameLabel.insertAdjacentHTML('beforebegin', '<label><span>First name</span><input autocomplete="section-booking given-name" required placeholder="Your first name" name="firstname"></label><label><span>Last name</span><input autocomplete="section-booking family-name" required placeholder="Your last name" name="lastname"></label>');
     legacyNameLabel.remove();
   }
+  form.setAttribute('autocomplete', 'on');
+  form.querySelector('[name="phone"]').setAttribute('autocomplete', 'section-booking tel');
+  form.querySelector('[name="email"]').setAttribute('autocomplete', 'section-booking email');
   var formStep = modal.querySelector('[data-booking-step="form"]');
   var pendingStep = modal.querySelector('[data-booking-step="pending"]');
   var title = modal.querySelector('[data-booking-title]');
