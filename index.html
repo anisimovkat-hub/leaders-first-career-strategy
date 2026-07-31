@@ -181,6 +181,12 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   var modal = document.getElementById('booking-form');
   if (!modal) return;
   var form = modal.querySelector('.booking-form');
+  var legacyNameInput = form.querySelector('[name="name"]');
+  if (legacyNameInput) {
+    var legacyNameLabel = legacyNameInput.closest('label');
+    legacyNameLabel.insertAdjacentHTML('beforebegin', '<label><span>First name</span><input autocomplete="given-name" required placeholder="Your first name" name="firstname"></label><label><span>Last name</span><input autocomplete="family-name" required placeholder="Your last name" name="lastname"></label>');
+    legacyNameLabel.remove();
+  }
   var formStep = modal.querySelector('[data-booking-step="form"]');
   var pendingStep = modal.querySelector('[data-booking-step="pending"]');
   var title = modal.querySelector('[data-booking-title]');
@@ -195,7 +201,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   calendlyStep.className = 'booking-step booking-calendly';
   calendlyStep.hidden = true;
   calendlyStep.setAttribute('data-booking-step', 'calendly');
-  calendlyStep.innerHTML = '<p class="eyebrow">Your details have been saved</p><h2>Now choose a date and time</h2><p class="booking-step__lede">Your name and email will already be filled in.</p><p class="booking-form__error" data-booking-error="true" role="alert" hidden></p><div id="calendly-inline-widget" style="width:100%;min-width:320px;height:830px"></div>';
+  calendlyStep.innerHTML = '<p class="eyebrow">Your details have been saved</p><h2>Now choose a date and time</h2><p class="booking-form__error" data-booking-error="true" role="alert" hidden></p><div id="calendly-inline-widget" style="width:100%;min-width:320px;height:830px"></div>';
   pendingStep.parentNode.insertBefore(calendlyStep, pendingStep);
   var calendlyContainer = calendlyStep.querySelector('#calendly-inline-widget');
   var errorMessage = calendlyStep.querySelector('[data-booking-error]');
@@ -229,7 +235,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   }
   function hubSpotFields(payload) {
     return Object.keys(payload).filter(function (name) { return name !== 'privacy_consent'; }).map(function (name) {
-      return { name: name === 'name' ? 'firstname' : name, value: String(payload[name]) };
+      return { name: name, value: String(payload[name]) };
     });
   }
   function saveLead(payload) {
@@ -271,7 +277,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
       window.Calendly.initInlineWidget({
         url: selected.paymentUrl,
         parentElement: calendlyContainer,
-        prefill: { name: payload.name, email: payload.email },
+        prefill: { firstName: payload.firstname, lastName: payload.lastname, email: payload.email },
         utm: {
           utmSource: payload.utm_source, utmMedium: payload.utm_medium, utmCampaign: payload.utm_campaign,
           utmContent: payload.utm_content, utmTerm: payload.utm_term
@@ -292,7 +298,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     if (window.leadersFirstMeta) window.leadersFirstMeta.trackCustom('ConsultationClick', { content_category: 'consultation', requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
     title.textContent = 'Book ' + selected.title.replace(/ Session$/, ''); summary.textContent = selected.title;
     modal.hidden = false; document.body.classList.add('booking-open');
-    setTimeout(function () { form.querySelector('[name="name"]').focus(); }, 30);
+    setTimeout(function () { form.querySelector('[name="firstname"]').focus(); }, 30);
   }
   form.querySelectorAll('[name="session_duration"]').forEach(function (option) {
     option.addEventListener('change', function () {
