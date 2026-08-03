@@ -50,6 +50,8 @@ window.leadersFirstMeta = {
 window.setTimeout(initLeadersFirstMetaPixel, 1500);
 </script><noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1072423188457511&amp;ev=PageView&amp;noscript=1" alt=""/></noscript><script data-guide-script="true">
 (function () {
+  var HUBSPOT_PORTAL_ID = '148956933';
+  var HUBSPOT_FORM_ID = 'a49159d0-8ceb-4f0a-a73a-b64b8f273d07';
   var modal = document.getElementById('guide-form');
   if (!modal) return;
   var form = modal.querySelector('.guide-form');
@@ -58,12 +60,20 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   var successTitle = modal.querySelector('[data-guide-success-title]');
   var successCopy = modal.querySelector('[data-guide-success-copy]');
   var emailFields = modal.querySelector('[data-guide-email-fields]');
+  var nameInput = modal.querySelector('[name="name"]');
   var emailInput = modal.querySelector('[name="email"]');
   var consentInput = modal.querySelector('[name="newsletter_consent"]');
   var emailButton = modal.querySelector('[data-guide-email-submit]');
   var telegramButton = modal.querySelector('[data-guide-telegram-submit]');
+  var emailButtonLabel = emailButton.innerHTML;
+  var errorMessage = document.createElement('p');
+  errorMessage.className = 'form-status form-status--error';
+  errorMessage.setAttribute('role', 'alert');
+  errorMessage.hidden = true;
+  form.insertBefore(errorMessage, emailButton);
   var lastFocus = null;
   var guideSubmitTracked = false;
+  var isSubmitting = false;
 
   function setField(name, value) {
     var field = form.querySelector('[name="' + name + '"]');
@@ -81,8 +91,71 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     emailFields.hidden = !emailSelected;
     emailButton.hidden = !emailSelected;
     telegramButton.hidden = channel !== 'telegram';
+    nameInput.required = emailSelected;
     emailInput.required = emailSelected;
     consentInput.required = emailSelected;
+  }
+
+  function setLoading(loading) {
+    isSubmitting = loading;
+    emailButton.disabled = loading;
+    emailButton.innerHTML = loading ? 'Sending your guide…' : emailButtonLabel;
+  }
+
+  function getCookie(name) {
+    return document.cookie.split('; ').reduce(function (value, item) {
+      var parts = item.split('=');
+      return parts.shift() === name ? decodeURIComponent(parts.join('=')) : value;
+    }, '');
+  }
+
+  function firstName(fullName) {
+    return String(fullName || '').trim().split(/\s+/)[0] || '';
+  }
+
+  function saveGuideLead(payload) {
+    var fields = [
+      { name: 'email', value: payload.email },
+      { name: 'firstname', value: firstName(payload.name) },
+      { name: 'lf_full_name', value: payload.name },
+      { name: 'lf_lead_intent', value: 'free_guide' },
+      { name: 'lf_lead_source', value: payload.lead_source || 'free_guide_block' },
+      { name: 'lf_lead_cta', value: payload.lead_cta || 'Get the Career Guide' },
+      { name: 'lf_delivery_channel', value: 'email' },
+      { name: 'lf_utm_source', value: payload.utm_source || '' },
+      { name: 'lf_utm_medium', value: payload.utm_medium || '' },
+      { name: 'lf_utm_campaign', value: payload.utm_campaign || '' }
+    ];
+    var context = { pageUri: payload.page_url, pageName: document.title };
+    var hutk = getCookie('hubspotutk');
+    if (hutk) context.hutk = hutk;
+    return fetch('https://api.hsforms.com/submissions/v3/integration/submit/' + HUBSPOT_PORTAL_ID + '/' + HUBSPOT_FORM_ID, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        submittedAt: Date.now(),
+        fields: fields,
+        context: context,
+        legalConsentOptions: {
+          consent: {
+            consentToProcess: true,
+            text: 'I agree to allow Leaders First to store and process my personal data and send the requested guide.',
+            communications: [{
+              value: true,
+              subscriptionTypeId: 3194690085,
+              text: 'I agree to receive the guide and Leaders First career emails. I can unsubscribe at any time.'
+            }]
+          }
+        }
+      })
+    }).then(function (response) {
+      if (!response.ok) {
+        return response.text().then(function (body) {
+          throw new Error('HubSpot guide submission failed (' + response.status + '): ' + body);
+        });
+      }
+      return response.text().then(function (body) { return body ? JSON.parse(body) : {}; });
+    });
   }
 
   function captureContext(trigger) {
@@ -106,6 +179,8 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     lastFocus = document.activeElement;
     form.reset();
     guideSubmitTracked = false;
+    errorMessage.hidden = true;
+    setLoading(false);
     captureContext(event && event.currentTarget);
     if (window.leadersFirstMeta) {
       window.leadersFirstMeta.trackCustom('GuideClick', {
@@ -144,26 +219,42 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     var channel = selectedChannel();
-    if (channel !== 'email' || !form.reportValidity()) return;
+    if (channel !== 'email' || !form.reportValidity() || isSubmitting) return;
     setField('submitted_at', new Date().toISOString());
     var payload = {};
     new FormData(form).forEach(function (value, key) { payload[key] = value; });
     window.__leadersFirstLastGuideLead = payload;
-    window.dispatchEvent(new CustomEvent('leadersfirst:guide-lead-submit', { detail: payload }));
-    if (!guideSubmitTracked && window.leadersFirstMeta) {
-      guideSubmitTracked = true;
-      window.leadersFirstMeta.trackCustom('GuideRequestSubmitted', {
-        content_name: 'Career Direction Guide',
-        content_category: 'guide',
-        delivery_channel: channel,
-        lead_source: payload.lead_source || 'free_guide_block'
-      });
-    }
-    formStep.hidden = true;
-    successStep.hidden = false;
-    successTitle.textContent = 'Your guide is on its way';
-    successCopy.textContent = 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
-    successStep.querySelector('button').focus();
+    errorMessage.hidden = true;
+    setLoading(true);
+    saveGuideLead(payload).then(function () {
+      window.dispatchEvent(new CustomEvent('leadersfirst:guide-lead-submit', { detail: payload }));
+      if (!guideSubmitTracked && window.leadersFirstMeta) {
+        guideSubmitTracked = true;
+        window.leadersFirstMeta.track('Lead', {
+          content_name: 'Career Direction Guide',
+          content_category: 'guide',
+          delivery_channel: channel,
+          lead_source: payload.lead_source || 'free_guide_block'
+        });
+        window.leadersFirstMeta.trackCustom('GuideRequestSubmitted', {
+          content_name: 'Career Direction Guide',
+          content_category: 'guide',
+          delivery_channel: channel,
+          lead_source: payload.lead_source || 'free_guide_block'
+        });
+      }
+      formStep.hidden = true;
+      successStep.hidden = false;
+      successTitle.textContent = 'Your guide is on its way';
+      successCopy.textContent = 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
+      successStep.querySelector('button').focus();
+    }).catch(function (error) {
+      console.error('Leaders First guide request could not be saved:', error);
+      errorMessage.textContent = 'We could not send your guide. Please try again.';
+      errorMessage.hidden = false;
+    }).finally(function () {
+      setLoading(false);
+    });
   });
   document.addEventListener('keydown', function (event) {
     if (modal.hidden) return;
