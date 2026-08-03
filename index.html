@@ -137,10 +137,14 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   form.addEventListener('change', function (event) {
     if (event.target.name === 'delivery_channel') updateChannel();
   });
+  telegramButton.addEventListener('click', function (event) {
+    event.preventDefault();
+    window.location.assign('https://t.me/leaders_first_bot?start=career_direction_guide');
+  });
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     var channel = selectedChannel();
-    if (!channel || !form.reportValidity()) return;
+    if (channel !== 'email' || !form.reportValidity()) return;
     setField('submitted_at', new Date().toISOString());
     var payload = {};
     new FormData(form).forEach(function (value, key) { payload[key] = value; });
@@ -157,13 +161,8 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     }
     formStep.hidden = true;
     successStep.hidden = false;
-    if (channel === 'email') {
-      successTitle.textContent = 'Your guide is on its way';
-      successCopy.textContent = 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
-    } else {
-      successTitle.textContent = 'Telegram delivery is coming soon';
-      successCopy.textContent = 'Your preference has been saved. The Telegram bot link will be connected here at the next stage.';
-    }
+    successTitle.textContent = 'Your guide is on its way';
+    successCopy.textContent = 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
     successStep.querySelector('button').focus();
   });
   document.addEventListener('keydown', function (event) {
