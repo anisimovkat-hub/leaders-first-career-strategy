@@ -48,7 +48,59 @@ window.leadersFirstMeta = {
 };
 
 window.setTimeout(initLeadersFirstMetaPixel, 1500);
-</script><noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1072423188457511&amp;ev=PageView&amp;noscript=1" alt=""/></noscript><script data-guide-script="true">
+</script><noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1072423188457511&amp;ev=PageView&amp;noscript=1" alt=""/></noscript><script data-attribution-script="true">
+(function () {
+  var names = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  var storageKey = 'leaders_first_utm_v1';
+  var maxAgeMs = 90 * 24 * 60 * 60 * 1000;
+
+  function readStored() {
+    try {
+      var value = JSON.parse(window.localStorage.getItem(storageKey) || '{}');
+      if (!value || typeof value !== 'object') return {};
+      if (!value.saved_at || Date.now() - Number(value.saved_at) > maxAgeMs) {
+        window.localStorage.removeItem(storageKey);
+        return {};
+      }
+      return value;
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function capture() {
+    var stored = readStored();
+    var params = new URLSearchParams(window.location.search);
+    var hasCurrentUtm = false;
+
+    names.forEach(function (name) {
+      var value = (params.get(name) || '').trim();
+      if (value) {
+        stored[name] = value;
+        hasCurrentUtm = true;
+      }
+    });
+
+    if (hasCurrentUtm) {
+      stored.saved_at = Date.now();
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(stored));
+      } catch (error) {}
+    }
+
+    return stored;
+  }
+
+  var attribution = capture();
+  window.leadersFirstAttribution = {
+    get: function (name) {
+      var current = (new URLSearchParams(window.location.search).get(name) || '').trim();
+      return current || attribution[name] || '';
+    }
+  };
+})();
+</script>
+<script data-guide-script="true">
 (function () {
   var HUBSPOT_PORTAL_ID = '148956933';
   var HUBSPOT_FORM_ID = 'a49159d0-8ceb-4f0a-a73a-b64b8f273d07';
@@ -168,9 +220,9 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     setField('page_url', window.location.href);
     setField('page_referrer', document.referrer);
     setField('guide_opened_at', new Date().toISOString());
-    var params = new URLSearchParams(window.location.search);
     ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (name) {
-      setField(name, params.get(name) || '');
+      var value = window.leadersFirstAttribution ? window.leadersFirstAttribution.get(name) : '';
+      setField(name, value);
     });
   }
 
@@ -323,8 +375,10 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     setField('page_url', window.location.href);
     setField('page_referrer', document.referrer);
     setField('booking_opened_at', new Date().toISOString());
-    var params = new URLSearchParams(window.location.search);
-    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (name) { setField(name, params.get(name) || ''); });
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (name) {
+      var value = window.leadersFirstAttribution ? window.leadersFirstAttribution.get(name) : '';
+      setField(name, value);
+    });
   }
   function hubSpotFields(payload) {
     return Object.keys(payload).filter(function (name) { return name !== 'privacy_consent'; }).map(function (name) {
