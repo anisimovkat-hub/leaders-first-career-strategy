@@ -1,4 +1,24 @@
 <!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" href="assets/leaders-first-logo.png" as="image"/><link rel="preload" href="assets/arrow-up-right.svg" as="image"/><link rel="preload" href="assets/maria-portrait.jpeg" as="image"/><link rel="preload" href="assets/raeng-logo.png" as="image"/><link rel="preload" href="assets/forbes-logo.svg" as="image"/><link rel="preload" href="assets/career-move.jpeg" as="image"/><link rel="preload" href="assets/linkedin-logo.svg" as="image"/><link rel="preload" href="assets/maria-speaking.jpeg" as="image"/><link rel="preload" href="assets/career-direction-guide.jpg" as="image"/><link rel="preload" href="assets/career-workspace.jpeg" as="image"/><link rel="preload" href="assets/leaders-first-footer-logo.jpg" as="image"/><title>Leaders First — Tailored Career Strategy with Maria</title><meta name="description" content="Focused 1:1 career strategy for international professionals. Get clarity, stronger positioning and a practical next-step plan."/><meta property="og:title" content="Know what to do next in your career"/><meta property="og:description" content="Tailored career strategy with Maria · Leaders First"/><meta property="og:type" content="website"/><meta property="og:image" content="/og.png"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Know what to do next in your career"/><meta name="twitter:description" content="Tailored career strategy with Maria · Leaders First"/><meta name="twitter:image" content="/og.png"/><meta name="twitter:image:width" content="1200"/><meta name="twitter:image:height" content="630"/><link rel="shortcut icon" href="/favicon.svg"/><link rel="icon" href="/favicon.svg"/>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=111597180', 'ym');
+
+    ym(111597180, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+
+    window.leadersFirstMetrika = {
+      goal: function (goalName, parameters) {
+        if (typeof window.ym === 'function') {
+          window.ym(111597180, 'reachGoal', goalName, parameters || {});
+        }
+      }
+    };
+</script>
+<!-- /Yandex.Metrika counter -->
 <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css"/>
 <style>
 /*! tailwindcss v4.2.1 | MIT License | https://tailwindcss.com */
@@ -241,6 +261,11 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
         lead_source: form.querySelector('[name="lead_source"]').value || 'free_guide_block'
       });
     }
+    if (window.leadersFirstMetrika) {
+      window.leadersFirstMetrika.goal('guide_open', {
+        lead_source: form.querySelector('[name="lead_source"]').value || 'free_guide_block'
+      });
+    }
     formStep.hidden = false;
     successStep.hidden = true;
     updateChannel();
@@ -266,6 +291,12 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
   });
   telegramButton.addEventListener('click', function (event) {
     event.preventDefault();
+    if (window.leadersFirstMetrika) {
+      window.leadersFirstMetrika.goal('guide_telegram', {
+        delivery_channel: 'telegram',
+        lead_source: form.querySelector('[name="lead_source"]').value || 'free_guide_block'
+      });
+    }
     window.location.assign('https://t.me/leaders_first_bot?start=career_direction_guide');
   });
   form.addEventListener('submit', function (event) {
@@ -280,20 +311,33 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     setLoading(true);
     saveGuideLead(payload).then(function () {
       window.dispatchEvent(new CustomEvent('leadersfirst:guide-lead-submit', { detail: payload }));
-      if (!guideSubmitTracked && window.leadersFirstMeta) {
+      if (!guideSubmitTracked) {
         guideSubmitTracked = true;
-        window.leadersFirstMeta.track('Lead', {
-          content_name: 'Career Direction Guide',
-          content_category: 'guide',
-          delivery_channel: channel,
-          lead_source: payload.lead_source || 'free_guide_block'
-        });
-        window.leadersFirstMeta.trackCustom('GuideRequestSubmitted', {
-          content_name: 'Career Direction Guide',
-          content_category: 'guide',
-          delivery_channel: channel,
-          lead_source: payload.lead_source || 'free_guide_block'
-        });
+        if (window.leadersFirstMeta) {
+          window.leadersFirstMeta.track('Lead', {
+            content_name: 'Career Direction Guide',
+            content_category: 'guide',
+            delivery_channel: channel,
+            lead_source: payload.lead_source || 'free_guide_block'
+          });
+          window.leadersFirstMeta.trackCustom('GuideRequestSubmitted', {
+            content_name: 'Career Direction Guide',
+            content_category: 'guide',
+            delivery_channel: channel,
+            lead_source: payload.lead_source || 'free_guide_block'
+          });
+        }
+        if (window.leadersFirstMetrika) {
+          window.leadersFirstMetrika.goal('guide_submit', {
+            delivery_channel: channel,
+            lead_source: payload.lead_source || 'free_guide_block',
+            utm_source: payload.utm_source || '',
+            utm_medium: payload.utm_medium || '',
+            utm_campaign: payload.utm_campaign || '',
+            utm_content: payload.utm_content || '',
+            utm_term: payload.utm_term || ''
+          });
+        }
       }
       formStep.hidden = true;
       successStep.hidden = false;
@@ -431,6 +475,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
         }
       });
       if (window.leadersFirstMeta) window.leadersFirstMeta.track('InitiateCheckout', { content_name: selected.title, requested_service: selected.id, session_duration: selected.duration });
+      if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('calendly_open', { requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source });
       window.dispatchEvent(new CustomEvent('leadersfirst:calendly-opened', { detail: payload }));
       setTimeout(function () { calendlyStep.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
     });
@@ -443,6 +488,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     form.reset(); calendlyContainer.replaceChildren(); errorMessage.hidden = true; calendlyStep.hidden = true; pendingStep.hidden = true; formStep.hidden = false;
     submitButton.disabled = true; submitButton.innerHTML = submitLabel; bookingLeadTracked = false; bookingScheduledTracked = false; fillTracking();
     if (window.leadersFirstMeta) window.leadersFirstMeta.trackCustom('ConsultationClick', { content_category: 'consultation', requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
+    if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('consultation_open', { requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
     title.textContent = 'Book ' + selected.title.replace(/ Session$/, ''); summary.textContent = selected.title;
     modal.hidden = false; document.body.classList.add('booking-open');
     setTimeout(function () { form.querySelector('[name="firstname"]').focus(); }, 30);
@@ -451,6 +497,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     option.addEventListener('change', function () {
       selected.duration = option.value; selected.paymentUrl = bookingUrls[selected.id] && bookingUrls[selected.id][selected.duration] || ''; setField('payment_url', selected.paymentUrl); submitButton.disabled = false;
       if (window.leadersFirstMeta) window.leadersFirstMeta.trackCustom('ConsultationOptionSelected', { content_category: 'consultation', requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source });
+      if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('consultation_option', { requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source });
     });
   });
   function closeBooking() { modal.hidden = true; document.body.classList.remove('booking-open'); if (lastFocus && lastFocus.focus && document.body.contains(lastFocus)) lastFocus.focus(); }
@@ -464,7 +511,11 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     setLoading(true);
     saveLead(payload).then(function () {
       window.dispatchEvent(new CustomEvent('leadersfirst:booking-submit', { detail: payload }));
-      if (!bookingLeadTracked && window.leadersFirstMeta) { bookingLeadTracked = true; window.leadersFirstMeta.track('Lead', { content_name: 'Consultation application', content_category: 'consultation', requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source }); }
+      if (!bookingLeadTracked) {
+        bookingLeadTracked = true;
+        if (window.leadersFirstMeta) window.leadersFirstMeta.track('Lead', { content_name: 'Consultation application', content_category: 'consultation', requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source });
+        if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('consultation_submit', { requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source, utm_source: payload.utm_source || '', utm_medium: payload.utm_medium || '', utm_campaign: payload.utm_campaign || '', utm_content: payload.utm_content || '', utm_term: payload.utm_term || '' });
+      }
       return showCalendly(payload);
     }).catch(function (error) {
       console.error('Leaders First booking could not continue:', error);
@@ -475,6 +526,7 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
     if (event.origin !== 'https://calendly.com' || !event.data || event.data.event !== 'calendly.event_scheduled' || bookingScheduledTracked) return;
     bookingScheduledTracked = true;
     if (window.leadersFirstMeta) window.leadersFirstMeta.track('Schedule', { content_name: selected.title, requested_service: selected.id, session_duration: selected.duration });
+    if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('booking_scheduled', { requested_service: selected.id, session_duration: selected.duration, lead_source: selected.source });
     window.dispatchEvent(new CustomEvent('leadersfirst:calendly-scheduled', { detail: event.data.payload || {} }));
   });
   document.addEventListener('keydown', function (event) { if (!modal.hidden && event.key === 'Escape') closeBooking(); });
@@ -504,4 +556,4 @@ window.setTimeout(initLeadersFirstMetaPixel, 1500);
       });
     });
   });
-})();</script><footer><a class="footer-logo" href="#top" aria-label="Leaders First home"><img src="assets/leaders-first-footer-logo.jpg" alt="Leaders First"/></a><p>Tailored career strategy for international professionals.</p><a href="#top">Back to top ↑</a></footer></main></body></html>
+})();</script><noscript><div><img src="https://mc.yandex.ru/watch/111597180" style="position:absolute; left:-9999px;" alt="" /></div></noscript><footer><a class="footer-logo" href="#top" aria-label="Leaders First home"><img src="assets/leaders-first-footer-logo.jpg" alt="Leaders First"/></a><p>Tailored career strategy for international professionals.</p><a href="#top">Back to top ↑</a></footer></main></body></html>
