@@ -1,3 +1,12 @@
+var leadersFirstLandingVariant = document.documentElement.getAttribute('data-landing-variant') || 'main';
+window.leadersFirstLandingVariant = leadersFirstLandingVariant;
+
+function leadersFirstAnalyticsParameters(parameters) {
+  return Object.assign({ landing_variant: leadersFirstLandingVariant }, parameters || {});
+}
+
+window.leadersFirstAnalyticsParameters = leadersFirstAnalyticsParameters;
+
 (function(m,e,t,r,i,k,a){
         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();
@@ -6,11 +15,12 @@
     })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=111597180', 'ym');
 
     ym(111597180, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    ym(111597180, 'params', leadersFirstAnalyticsParameters());
 
     window.leadersFirstMetrika = {
       goal: function (goalName, parameters) {
         if (typeof window.ym === 'function') {
-          window.ym(111597180, 'reachGoal', goalName, parameters || {});
+          window.ym(111597180, 'reachGoal', goalName, leadersFirstAnalyticsParameters(parameters));
         }
       }
     };
@@ -40,18 +50,18 @@ function initLeadersFirstMetaPixel() {
   );
 
   fbq('init', '1072423188457511');
-  fbq('track', 'PageView');
+  fbq('track', 'PageView', leadersFirstAnalyticsParameters());
 }
 
 window.leadersFirstMeta = {
   track: function (eventName, parameters) {
     if (typeof window.fbq === 'function') {
-      window.fbq('track', eventName, parameters || {});
+      window.fbq('track', eventName, leadersFirstAnalyticsParameters(parameters));
     }
   },
   trackCustom: function (eventName, parameters) {
     if (typeof window.fbq === 'function') {
-      window.fbq('trackCustom', eventName, parameters || {});
+      window.fbq('trackCustom', eventName, leadersFirstAnalyticsParameters(parameters));
     }
   }
 };

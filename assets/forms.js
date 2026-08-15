@@ -1,3 +1,8 @@
+window.leadersFirstPage = {
+  landingVariant: window.leadersFirstLandingVariant || document.documentElement.getAttribute('data-landing-variant') || 'main',
+  defaultService: document.documentElement.getAttribute('data-default-service') || ''
+};
+
 (function () {
   var HUBSPOT_PORTAL_ID = '148956933';
   var HUBSPOT_FORM_ID = 'a49159d0-8ceb-4f0a-a73a-b64b8f273d07';
@@ -71,6 +76,7 @@
       { name: 'lf_lead_source', value: payload.lead_source || 'free_guide_block' },
       { name: 'lf_lead_cta', value: payload.lead_cta || 'Get the Career Guide' },
       { name: 'lf_delivery_channel', value: 'email' },
+      { name: 'landing_variant', value: payload.landing_variant || window.leadersFirstPage.landingVariant },
       { name: 'lf_utm_source', value: payload.utm_source || '' },
       { name: 'lf_utm_medium', value: payload.utm_medium || '' },
       { name: 'lf_utm_campaign', value: payload.utm_campaign || '' }
@@ -114,6 +120,7 @@
     setField('lead_cta', trigger && trigger.dataset.leadCta || 'Get the Career Guide');
     setField('requested_asset', 'career_direction_guide');
     setField('automation_action', 'send_career_direction_guide');
+    setField('landing_variant', window.leadersFirstPage.landingVariant);
     setField('page_url', window.location.href);
     setField('page_referrer', document.referrer);
     setField('guide_opened_at', new Date().toISOString());
@@ -242,6 +249,11 @@
     career_clarity_direction: { '50': 'https://calendly.com/leaders-first/50', '90': 'https://calendly.com/leaders-first/deep-career-session-90min' },
     linkedin_recruiter_visibility: { '50': 'https://calendly.com/leaders-first/power-linkedin-session-50min', '90': 'https://calendly.com/leaders-first/deep-linkedin-session-90min' }
   };
+  var serviceTitles = {
+    career_clarity_direction: 'Career Clarity & Direction Session',
+    linkedin_recruiter_visibility: 'LinkedIn Recruiter Visibility Session'
+  };
+  var defaultServiceId = window.leadersFirstPage.defaultService;
   var modal = document.getElementById('booking-form');
   if (!modal) return;
   var form = modal.querySelector('.booking-form');
@@ -294,6 +306,7 @@
     setField('lead_cta', selected.cta);
     setField('requested_service', selected.id);
     setField('payment_url', selected.paymentUrl);
+    setField('landing_variant', window.leadersFirstPage.landingVariant);
     setField('page_url', window.location.href);
     setField('page_referrer', document.referrer);
     setField('booking_opened_at', new Date().toISOString());
@@ -362,7 +375,8 @@
     if (event) event.preventDefault();
     var trigger = event && event.currentTarget;
     lastFocus = trigger || document.activeElement;
-    selected = { id: trigger && (trigger.dataset.sessionId || trigger.dataset.requestedService) || 'consultation_general', title: trigger && trigger.dataset.sessionTitle || '1:1 Career Strategy Session', duration: '', paymentUrl: '', source: trigger && trigger.dataset.leadSource || 'session_card', cta: trigger && trigger.dataset.leadCta || (trigger && trigger.textContent || 'Book this session').trim() };
+    var serviceId = trigger && (trigger.dataset.sessionId || trigger.dataset.requestedService) || defaultServiceId || 'consultation_general';
+    selected = { id: serviceId, title: trigger && trigger.dataset.sessionTitle || serviceTitles[serviceId] || '1:1 Career Strategy Session', duration: '', paymentUrl: '', source: trigger && trigger.dataset.leadSource || 'session_card', cta: trigger && trigger.dataset.leadCta || (trigger && trigger.textContent || 'Book this session').trim() };
     form.reset(); calendlyContainer.replaceChildren(); errorMessage.hidden = true; calendlyStep.hidden = true; pendingStep.hidden = true; formStep.hidden = false;
     submitButton.disabled = true; submitButton.innerHTML = submitLabel; bookingLeadTracked = false; bookingScheduledTracked = false; fillTracking();
     if (window.leadersFirstMeta) window.leadersFirstMeta.trackCustom('ConsultationClick', { content_category: 'consultation', requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
