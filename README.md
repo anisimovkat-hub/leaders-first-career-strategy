@@ -17,4 +17,4 @@ Keep the analytics script before the form script. The forms read UTM attribution
 - `/career/` uses `landing_variant=career` and is fixed to `career_clarity_direction`.
 - `/linkedin/` uses `landing_variant=linkedin` and is fixed to `linkedin_recruiter_visibility`.
 
-The specialised pages load shared files from `../assets/`. Both keep the 50-minute and 90-minute booking options; the shared form script owns all four Calendly event URLs.
+The specialised pages load shared files from `../assets/`. They currently expose only the £120 50-minute session; the £195 90-minute option remains in the markup and shared Calendly mapping but is hidden and disabled via `data-hide-deep-session="true"`.

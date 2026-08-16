@@ -257,6 +257,15 @@ window.leadersFirstPage = {
   var modal = document.getElementById('booking-form');
   if (!modal) return;
   var form = modal.querySelector('.booking-form');
+  var hideDeepSession = document.documentElement.getAttribute('data-hide-deep-session') === 'true';
+  if (hideDeepSession) {
+    var deepSessionOption = form.querySelector('[name="session_duration"][value="90"]');
+    if (deepSessionOption) {
+      deepSessionOption.disabled = true;
+      var deepSessionLabel = deepSessionOption.closest('label');
+      if (deepSessionLabel) deepSessionLabel.hidden = true;
+    }
+  }
   var legacyNameInput = form.querySelector('[name="name"]');
   if (legacyNameInput) {
     var legacyNameLabel = legacyNameInput.closest('label');
