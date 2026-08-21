@@ -1,0 +1,15 @@
+/* Русский текст должен переноситься только по доступной ширине, без заданных разрывов. */
+html[lang="ru"] h1,
+html[lang="ru"] h2,
+html[lang="ru"] h3 {
+  text-wrap: wrap;
+}
+
+html[lang="ru"] h1 span {
+  display: inline;
+}
+
+html[lang="ru"] .audience-heading-line,
+html[lang="ru"] .editorial-break__headline-line {
+  white-space: normal;
+}

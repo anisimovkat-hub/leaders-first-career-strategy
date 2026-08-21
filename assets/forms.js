@@ -6,6 +6,7 @@ window.leadersFirstPage = {
 (function () {
   var HUBSPOT_PORTAL_ID = '148956933';
   var HUBSPOT_FORM_ID = 'a49159d0-8ceb-4f0a-a73a-b64b8f273d07';
+  var isRussian = document.documentElement.lang === 'ru';
   var modal = document.getElementById('guide-form');
   if (!modal) return;
   var form = modal.querySelector('.guide-form');
@@ -53,7 +54,7 @@ window.leadersFirstPage = {
   function setLoading(loading) {
     isSubmitting = loading;
     emailButton.disabled = loading;
-    emailButton.innerHTML = loading ? 'Sending your guide…' : emailButtonLabel;
+    emailButton.innerHTML = loading ? (isRussian ? 'Отправляем гид…' : 'Sending your guide…') : emailButtonLabel;
   }
 
   function getCookie(name) {
@@ -94,11 +95,11 @@ window.leadersFirstPage = {
         legalConsentOptions: {
           consent: {
             consentToProcess: true,
-            text: 'I agree to allow Leaders First to store and process my personal data and send the requested guide.',
+            text: isRussian ? 'Я согласен(-на) на обработку моих данных Leaders First, чтобы получить гид.' : 'I agree to allow Leaders First to store and process my personal data and send the requested guide.',
             communications: [{
               value: true,
               subscriptionTypeId: 3194690085,
-              text: 'I agree to receive the guide and Leaders First career emails. I can unsubscribe at any time.'
+              text: isRussian ? 'Я согласен(-на) получить гид и письма от Leaders First. Отписаться можно в любой момент.' : 'I agree to receive the guide and Leaders First career emails. I can unsubscribe at any time.'
             }]
           }
         }
@@ -117,7 +118,7 @@ window.leadersFirstPage = {
     setField('form_name', 'career_direction_guide');
     setField('lead_intent', 'free_guide');
     setField('lead_source', trigger && trigger.dataset.leadSource || 'free_guide_block');
-    setField('lead_cta', trigger && trigger.dataset.leadCta || 'Get the Career Guide');
+    setField('lead_cta', trigger && trigger.dataset.leadCta || (isRussian ? 'Получить гид' : 'Get the Career Guide'));
     setField('requested_asset', 'career_direction_guide');
     setField('automation_action', 'send_career_direction_guide');
     setField('landing_variant', window.leadersFirstPage.landingVariant);
@@ -225,12 +226,12 @@ window.leadersFirstPage = {
       }
       formStep.hidden = true;
       successStep.hidden = false;
-      successTitle.textContent = 'Your guide is on its way';
-      successCopy.textContent = 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
+      successTitle.textContent = isRussian ? 'Гид уже отправлен' : 'Your guide is on its way';
+      successCopy.textContent = isRussian ? 'Проверьте почту — он скоро придёт.' : 'Check your inbox for the Career Direction Guide and the next Leaders First newsletter.';
       successStep.querySelector('button').focus();
     }).catch(function (error) {
       console.error('Leaders First guide request could not be saved:', error);
-      errorMessage.textContent = 'We could not send your guide. Please try again.';
+      errorMessage.textContent = isRussian ? 'Не получилось отправить гид. Попробуйте ещё раз.' : 'We could not send your guide. Please try again.';
       errorMessage.hidden = false;
     }).finally(function () {
       setLoading(false);
@@ -245,11 +246,15 @@ window.leadersFirstPage = {
 (function () {
   var HUBSPOT_PORTAL_ID = '148956933';
   var HUBSPOT_FORM_ID = '5ad8883e-f289-4719-b8bd-97cc378ea0d1';
+  var isRussian = document.documentElement.lang === 'ru';
   var bookingUrls = {
     career_clarity_direction: { '50': 'https://calendly.com/leaders-first/50', '90': 'https://calendly.com/leaders-first/deep-career-session-90min' },
     linkedin_recruiter_visibility: { '50': 'https://calendly.com/leaders-first/power-linkedin-session-50min', '90': 'https://calendly.com/leaders-first/deep-linkedin-session-90min' }
   };
-  var serviceTitles = {
+  var serviceTitles = isRussian ? {
+    career_clarity_direction: 'Сессия «Куда двигаться в карьере»',
+    linkedin_recruiter_visibility: 'Сессия «LinkedIn, который замечают рекрутеры»'
+  } : {
     career_clarity_direction: 'Career Clarity & Direction Session',
     linkedin_recruiter_visibility: 'LinkedIn Recruiter Visibility Session'
   };
@@ -269,7 +274,7 @@ window.leadersFirstPage = {
   var legacyNameInput = form.querySelector('[name="name"]');
   if (legacyNameInput) {
     var legacyNameLabel = legacyNameInput.closest('label');
-    legacyNameLabel.insertAdjacentHTML('beforebegin', '<label><span>First name</span><input autocomplete="section-booking given-name" required placeholder="Your first name" name="firstname"></label><label><span>Last name</span><input autocomplete="section-booking family-name" required placeholder="Your last name" name="lastname"></label>');
+    legacyNameLabel.insertAdjacentHTML('beforebegin', isRussian ? '<label><span>Имя</span><input autocomplete="section-booking given-name" required placeholder="Ваше имя" name="firstname"></label><label><span>Фамилия</span><input autocomplete="section-booking family-name" required placeholder="Ваша фамилия" name="lastname"></label>' : '<label><span>First name</span><input autocomplete="section-booking given-name" required placeholder="Your first name" name="firstname"></label><label><span>Last name</span><input autocomplete="section-booking family-name" required placeholder="Your last name" name="lastname"></label>');
     legacyNameLabel.remove();
   }
   form.setAttribute('autocomplete', 'on');
@@ -289,7 +294,7 @@ window.leadersFirstPage = {
   calendlyStep.className = 'booking-step booking-calendly';
   calendlyStep.hidden = true;
   calendlyStep.setAttribute('data-booking-step', 'calendly');
-  calendlyStep.innerHTML = '<p class="eyebrow">Your details have been saved</p><h2>Now choose a date and time</h2><p class="booking-form__error" data-booking-error="true" role="alert" hidden></p><div id="calendly-inline-widget" style="width:100%;min-width:320px;height:830px"></div>';
+  calendlyStep.innerHTML = isRussian ? '<p class="eyebrow">Контакты сохранены</p><h2>Выберите дату и время</h2><p class="booking-form__error" data-booking-error="true" role="alert" hidden></p><div id="calendly-inline-widget" style="width:100%;min-width:320px;height:830px"></div>' : '<p class="eyebrow">Your details have been saved</p><h2>Now choose a date and time</h2><p class="booking-form__error" data-booking-error="true" role="alert" hidden></p><div id="calendly-inline-widget" style="width:100%;min-width:320px;height:830px"></div>';
   pendingStep.parentNode.insertBefore(calendlyStep, pendingStep);
   var calendlyContainer = calendlyStep.querySelector('#calendly-inline-widget');
   var errorMessage = calendlyStep.querySelector('[data-booking-error]');
@@ -306,7 +311,7 @@ window.leadersFirstPage = {
   }
   function setLoading(loading) {
     submitButton.disabled = loading;
-    submitButton.innerHTML = loading ? 'Saving your details…' : submitLabel;
+    submitButton.innerHTML = loading ? (isRussian ? 'Сохраняем…' : 'Saving your details…') : submitLabel;
   }
   function fillTracking() {
     setField('form_name', 'session_booking');
@@ -385,12 +390,12 @@ window.leadersFirstPage = {
     var trigger = event && event.currentTarget;
     lastFocus = trigger || document.activeElement;
     var serviceId = trigger && (trigger.dataset.sessionId || trigger.dataset.requestedService) || defaultServiceId || 'consultation_general';
-    selected = { id: serviceId, title: trigger && trigger.dataset.sessionTitle || serviceTitles[serviceId] || '1:1 Career Strategy Session', duration: '', paymentUrl: '', source: trigger && trigger.dataset.leadSource || 'session_card', cta: trigger && trigger.dataset.leadCta || (trigger && trigger.textContent || 'Book this session').trim() };
+    selected = { id: serviceId, title: trigger && trigger.dataset.sessionTitle || serviceTitles[serviceId] || (isRussian ? 'Индивидуальная карьерная сессия' : '1:1 Career Strategy Session'), duration: '', paymentUrl: '', source: trigger && trigger.dataset.leadSource || 'session_card', cta: trigger && trigger.dataset.leadCta || (trigger && trigger.textContent || (isRussian ? 'Выбрать сессию' : 'Book this session')).trim() };
     form.reset(); calendlyContainer.replaceChildren(); errorMessage.hidden = true; calendlyStep.hidden = true; pendingStep.hidden = true; formStep.hidden = false;
     submitButton.disabled = true; submitButton.innerHTML = submitLabel; bookingLeadTracked = false; bookingScheduledTracked = false; fillTracking();
     if (window.leadersFirstMeta) window.leadersFirstMeta.trackCustom('ConsultationClick', { content_category: 'consultation', requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
     if (window.leadersFirstMetrika) window.leadersFirstMetrika.goal('consultation_open', { requested_service: selected.id, lead_source: selected.source, cta_text: selected.cta });
-    title.textContent = 'Book ' + selected.title.replace(/ Session$/, ''); summary.textContent = selected.title;
+    title.textContent = isRussian ? 'Записаться: ' + selected.title.replace(/^Сессия «|»$/g, '') : 'Book ' + selected.title.replace(/ Session$/, ''); summary.textContent = selected.title;
     modal.hidden = false; document.body.classList.add('booking-open');
     setTimeout(function () { form.querySelector('[name="firstname"]').focus(); }, 30);
   }
@@ -420,7 +425,7 @@ window.leadersFirstPage = {
       return showCalendly(payload);
     }).catch(function (error) {
       console.error('Leaders First booking could not continue:', error);
-      formStep.hidden = false; calendlyStep.hidden = true; form.appendChild(errorMessage); errorMessage.textContent = 'We could not continue with your booking. Please try again.'; errorMessage.hidden = false;
+      formStep.hidden = false; calendlyStep.hidden = true; form.appendChild(errorMessage); errorMessage.textContent = isRussian ? 'Не получилось продолжить запись. Попробуйте ещё раз.' : 'We could not continue with your booking. Please try again.'; errorMessage.hidden = false;
     }).finally(function () { setLoading(false); });
   });
   window.addEventListener('message', function (event) {
